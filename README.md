@@ -1,21 +1,13 @@
 # PubSub
 
-**TODO: Add description**
+This project is a playground to build a distributed messaging queue in Elixir. 
+This is a project to learn more about distributed algorithms and the inner workings of current messaging brokers and message streaming services.
 
-## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `pub_sub` to your list of dependencies in `mix.exs`:
+### Next Steps
 
-```elixir
-def deps do
-  [
-    {:pub_sub, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/pub_sub](https://hexdocs.pm/pub_sub).
-
+- Add persistent topic storage. Probably RocksDB (maybe build my own later)
+- Create HTTP API endpoints and client library
+- Distribute topic caches to multiple nodes (This includes a lot of steps that I will update here when I get there)
+- Distribute Server process (HTTP interfacing process) to multiple nodes and load balance between
+- Document high-level architecture
