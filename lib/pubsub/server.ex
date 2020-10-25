@@ -1,43 +1,47 @@
 defmodule PubSub.Server do
   use GenServer
 
-  def start do
-    GenServer.start(__MODULE__, [], name: __MODULE__)
+  def start_link(topic_name) do
+    GenServer.start_link(PubSub.Server, topic_name, name: via_tuple(topic_name))
   end
 
-  def register(topic_name) do
-    GenServer.cast(__MODULE__, {:register, self(), topic_name})
+  def register(server_pid) do
+    GenServer.cast(server_pid, {:register, self()})
   end
 
-  def get_subscribers(topic_name) do
-    GenServer.call(__MODULE__, {:subscribers, topic_name})
+  def get_subscribers(server_pid) do
+    GenServer.call(server_pid, :subscribers)
   end
 
-  def publish(topic_name, message) do
-    GenServer.cast(__MODULE__, {:publish, topic_name, message})
+  def publish(server_pid, message) do
+    GenServer.cast(server_pid, {:publish, message})
   end
 
-  @impl GenServer
-  def init(_) do
-    {:ok, %{}}
-  end
-
-  @impl GenServer
-  def handle_call({:subscribers, topic_name}, _, state) do
-    subscribers = PubSub.Topics.get_subscribers(state, topic_name)
-    {:reply, subscribers, state}
+  def via_tuple(topic_name) do
+    PubSub.Registry.via_tuple({__MODULE__, topic_name})
   end
 
   @impl GenServer
-  def handle_cast({:publish, topic_name, message}, state) do
-    {:ok, topic} = Map.fetch(state, topic_name)
-    Enum.each(topic.subscribers, fn subscriber -> send(subscriber, message) end)
+  def init(topic_name) do
+    {:ok, {topic_name, []}}
+  end
+
+  @impl GenServer
+  def handle_call(:subscribers, _, state) do
+    {_, subscribers} = state
+    {:reply, state, subscribers}
+  end
+
+  @impl GenServer
+  def handle_cast({:publish, message}, state) do
+    {_, subscribers} = state
+    Enum.each(subscribers, fn subscriber -> send(subscriber, message) end)
     {:noreply, state}
   end
 
   @impl GenServer
-  def handle_cast({:register, pid, topic_name}, state) do
-    new_state = PubSub.Topics.register_subscriber(state, topic_name, pid)
-    {:noreply, new_state}
+  def handle_cast({:register, pid}, state) do
+    {topic_name, subscribers} = state
+    {:noreply, {topic_name, Enum.uniq([pid | subscribers])}}
   end
 end

@@ -1,20 +1,22 @@
 defmodule PubSub.Client do
+  # Just used for testing purposes right now
   # Client can either publish or receive,
   # doesn't really make sense for both
 
   def register(topic_name) do
-    PubSub.Server.register(topic_name)
+    PubSub.TopicCache.topic_process(topic_name)
   end
 
   def spawn_client(topic_name) do
     spawn(fn ->
-      PubSub.Server.register(topic_name)
+      pid = PubSub.TopicCache.topic_process(topic_name)
+      PubSub.Server.register(pid)
       wait_for_message()
     end)
   end
 
-  def publish(topic, message) do
-    PubSub.Server.publish(topic, message)
+  def publish(server_pid, message) do
+    PubSub.Server.publish(server_pid, message)
   end
 
   def wait_for_message do

@@ -16,14 +16,17 @@ defmodule PubSub.TopicCache do
     }
   end
 
-  # def topic_process(topic_name) do
-
-  # end
+  def topic_process(topic_name) do
+    case start_child(topic_name) do
+      {:ok, pid} -> pid
+      {:error, {:already_started, pid}} -> pid
+    end
+  end
 
   def start_child(topic_name) do
     DynamicSupervisor.start_child(
       __MODULE__,
-      {PubSub.Topics, topic_name}
+      {PubSub.Server, topic_name}
     )
   end
 end
