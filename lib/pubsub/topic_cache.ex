@@ -1,6 +1,8 @@
 defmodule PubSub.TopicCache do
+  require Logger
+
   def start_link() do
-    IO.puts("Starting topic cache")
+    Logger.info("Starting Topic Cache...")
 
     DynamicSupervisor.start_link(
       name: __MODULE__,

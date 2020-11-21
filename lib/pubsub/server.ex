@@ -1,7 +1,9 @@
 defmodule PubSub.Server do
   use GenServer
+  require Logger
 
   def start_link(topic_name) do
+    Logger.info("Starting Topic Server...")
     GenServer.start_link(PubSub.Server, topic_name, name: via_tuple(topic_name))
   end
 
