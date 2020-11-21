@@ -1,11 +1,14 @@
 defmodule PubSub.ServerPlug do
-  import Plug.Conn
+  use Plug.Router
 
-  def init(options), do: options
+  plug :match
+  plug :dispatch
 
-  def call(conn, _opts) do
-    conn
-    |> put_resp_content_type("text/plain")
-    |> send_resp(200, "Hi there!\n")
+  get "/" do
+    send_resp(conn, 200, "Hi there!")
+  end
+
+  match _ do
+    send_resp(conn, 404, "oops")
   end
 end
