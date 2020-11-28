@@ -25,6 +25,13 @@ defmodule PubSub.TopicCache do
     end
   end
 
+  def topic_exists?(topic_name) do
+    case Registry.lookup(PubSub.TopicRegistry, {PubSub.Server, topic_name}) do
+      [{_, _}] -> true
+      _ -> false
+    end
+  end
+
   def start_child(topic_name) do
     DynamicSupervisor.start_child(
       __MODULE__,

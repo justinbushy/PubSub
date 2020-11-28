@@ -3,7 +3,7 @@ defmodule PubSub.Server do
   require Logger
 
   def start_link(topic_name) do
-    Logger.info("Starting Topic Server...")
+    Logger.info("Starting Topic Server for #{topic_name}...")
     GenServer.start_link(PubSub.Server, topic_name, name: via_tuple(topic_name))
   end
 
@@ -20,7 +20,7 @@ defmodule PubSub.Server do
   end
 
   def via_tuple(topic_name) do
-    PubSub.Registry.via_tuple({__MODULE__, topic_name})
+    PubSub.TopicRegistry.via_tuple({__MODULE__, topic_name})
   end
 
   @impl GenServer
