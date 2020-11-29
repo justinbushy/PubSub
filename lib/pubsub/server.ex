@@ -7,14 +7,6 @@ defmodule PubSub.Server do
     GenServer.start_link(PubSub.Server, topic_name, name: via_tuple(topic_name))
   end
 
-  def register(server_pid) do
-    GenServer.cast(server_pid, {:register, self()})
-  end
-
-  def get_subscribers(server_pid) do
-    GenServer.call(server_pid, :subscribers)
-  end
-
   def publish(server_pid, message) do
     GenServer.cast(server_pid, {:publish, message})
   end
@@ -25,25 +17,16 @@ defmodule PubSub.Server do
 
   @impl GenServer
   def init(topic_name) do
-    {:ok, {topic_name, []}}
-  end
-
-  @impl GenServer
-  def handle_call(:subscribers, _, state) do
-    {_, subscribers} = state
-    {:reply, state, subscribers}
+    {:ok, topic_name}
   end
 
   @impl GenServer
   def handle_cast({:publish, message}, state) do
-    {_, subscribers} = state
-    Enum.each(subscribers, fn subscriber -> send(subscriber, message) end)
-    {:noreply, state}
-  end
+    topic_name = state
 
-  @impl GenServer
-  def handle_cast({:register, pid}, state) do
-    {topic_name, subscribers} = state
-    {:noreply, {topic_name, Enum.uniq([pid | subscribers])}}
+    Registry.dispatch(Registry.WebSocket, "/ws/#{topic_name}", fn entries ->
+      for {pid, _} <- entries, do: send(pid, message)
+    end)
+    {:noreply, state}
   end
 end

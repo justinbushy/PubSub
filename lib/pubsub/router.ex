@@ -14,6 +14,11 @@ defmodule PubSub.Router do
   end
 
   put "/topic" do
+    message = conn.body_params["message"]
+    conn.body_params["topic_name"]
+    |> PubSub.TopicCache.topic_process()
+    |> PubSub.Server.publish(message)
+
     send_resp(conn, 200, "Published to topic.")
   end
 

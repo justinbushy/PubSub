@@ -2,7 +2,7 @@ defmodule PubSub.WebsocketPlug do
   @behaviour :cowboy_websocket
 
   def init(request, _state) do
-    IO.inspect(hd(request.path_info))
+    IO.inspect(request.path)
     state  = %{registry_key: request.path, topic_name: hd(request.path_info)}
 
     {:cowboy_websocket, request, state}
@@ -28,6 +28,7 @@ defmodule PubSub.WebsocketPlug do
   end
 
   def websocket_info(info, state) do
+    IO.puts("INFO: #{inspect info}")
     {:reply, {:text, info}, state}
   end
 end
