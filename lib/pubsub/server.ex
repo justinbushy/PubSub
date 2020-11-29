@@ -21,12 +21,11 @@ defmodule PubSub.Server do
   end
 
   @impl GenServer
-  def handle_cast({:publish, message}, state) do
-    topic_name = state
+  def handle_cast({:publish, message}, topic_name) do
 
     Registry.dispatch(Registry.WebSocket, "/ws/#{topic_name}", fn entries ->
       for {pid, _} <- entries, do: send(pid, message)
     end)
-    {:noreply, state}
+    {:noreply, topic_name}
   end
 end
