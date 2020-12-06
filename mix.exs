@@ -23,7 +23,8 @@ defmodule PubSub.MixProject do
   defp deps do
     [
       {:plug_cowboy, "~> 2.0"},
-      {:jason, "~> 1.2"}
+      {:jason, "~> 1.2"},
+      {:redix, "~> 1.0"}
     ]
   end
 end
