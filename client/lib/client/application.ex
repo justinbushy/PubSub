@@ -8,8 +8,11 @@ defmodule Client.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: Client.Worker.start_link(arg)
-      # {Client.Worker, arg}
+      {Finch, name: MyFinch, pools: %{
+        default: [
+          protocol: :http2
+        ]
+      }}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
