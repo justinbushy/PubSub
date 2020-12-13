@@ -10,7 +10,7 @@ defmodule Client.Producer do
   def publish_message(topic_name, message) do
     body = Jason.encode!(%{"topic_name" => topic_name, "message" => message})
 
-    Finch.build({:put, "http://localhost:8080/topic", @headers, body})
+    Finch.build(:put, "http://localhost:8080/topic", @headers, body)
     |> Finch.request(MyFinch)
   end
 end
